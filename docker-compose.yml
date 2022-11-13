@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  dind:
+    container_name: dind
+    image: docker:dind
+    privileged: true
+    command: --storage-driver=overlay2
+    networks:
+      jenkins:
+        aliases:
+          - "docker"
+    volumes:
+      - ./jenkins-data:/var/jenkins_home
+    ports:
+      - 2376:2376
+      
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:jdk11
+    networks:
+      jenkins:
+    environment:
+      - DOCKER_HOST=tcp://docker:2376 \
+    ports:
+      - 8080:8080
+      - 50000:50000 
+    volumes:
+      - ./jenkins-data:/var/jenkins_home 
+
+networks:
+  jenkins:
